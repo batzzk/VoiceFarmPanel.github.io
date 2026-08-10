@@ -1,66 +1,53 @@
-import { assets, patcher, storage } from '@revenge-mod/api'
-import { findByPropsLazy, findByTypeNameLazy } from '@revenge-mod/metro'
-import { toasts } from '@revenge-mod/ui'
-import { IconButton } from 'shared:components'
+let isFakeMute = false;
+let originalMuteState = false;
 
-const CONFIG = {
-    channelId: "1532113648447787068"
-};
-
-let isFarming = false;
-let hasJoined = false;
-let unpatches = [];
-
-// Função para entrar na call usando a API do Revenge
-function joinVoice() {
+// Função para ativar/desativar o fake mute
+function toggleFakeMute() {
+    isFakeMute = !isFakeMute;
+    
     try {
-        const voiceModule = findByPropsLazy('joinVoiceChannel');
-        if (voiceModule?.joinVoiceChannel) {
-            voiceModule.joinVoiceChannel(CONFIG.channelId);
-            hasJoined = true;
-            updateStatus("Conectado");
-            console.log("[Farm] Entrou na call.");
+        // Tenta achar o módulo de voz
+        const modules = Object.values(webpackChunkdiscord_app?.push?.([[], {}, e => e])?.c || {});
+        const voiceMod = modules.find(m => m?.exports?.setSelfMute);
+        
+        if (voiceMod) {
+            if (isFakeMute) {
+                // Salva o estado real e força mute = true (mas sem enviar pro servidor)
+                originalMuteState = voiceMod.exports.isSelfMute?.() || false;
+                voiceMod.exports.setSelfMute(true);
+                updateStatus("🔇 Fake Mute ATIVO");
+                console.log("[FakeMute] Ativado - você parece mutado mas não está.");
+            } else {
+                // Restaura o estado real
+                voiceMod.exports.setSelfMute(originalMuteState);
+                updateStatus("🔊 Fake Mute DESATIVADO");
+                console.log("[FakeMute] Desativado - estado real restaurado.");
+            }
         } else {
-            updateStatus("Erro: módulo de voz não encontrado");
+            updateStatus("❌ Erro: módulo de voz não encontrado");
         }
     } catch (e) {
-        updateStatus("Erro ao conectar");
-        console.error("[Farm] Erro:", e);
-    }
-}
-
-function leaveVoice() {
-    try {
-        const voiceModule = findByPropsLazy('leaveVoiceChannel');
-        if (voiceModule?.leaveVoiceChannel) {
-            voiceModule.leaveVoiceChannel();
-            hasJoined = false;
-            updateStatus("Desconectado");
-            console.log("[Farm] Saiu da call.");
-        } else {
-            updateStatus("Erro: não foi possível sair");
-        }
-    } catch (e) {
-        console.error("[Farm] Erro ao sair:", e);
+        updateStatus("❌ Erro ao alternar");
+        console.error("[FakeMute] Erro:", e);
     }
 }
 
 function updateStatus(text) {
-    const statusEl = document.getElementById("farm-status");
-    if (statusEl) statusEl.innerText = "Status: " + text;
+    const statusEl = document.getElementById("fake-mute-status");
+    if (statusEl) statusEl.innerText = text;
 }
 
 function createPanel() {
-    const old = document.getElementById("farm-panel");
+    const old = document.getElementById("fake-mute-panel");
     if (old) old.remove();
 
     const panel = document.createElement("div");
-    panel.id = "farm-panel";
+    panel.id = "fake-mute-panel";
     panel.style.cssText = `
         position: fixed;
-        bottom: 80px;
+        bottom: 150px;
         right: 20px;
-        width: 220px;
+        width: 200px;
         background: #1e1e2e;
         border: 1px solid #444;
         border-radius: 12px;
@@ -74,10 +61,10 @@ function createPanel() {
 
     panel.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <strong style="color:#a6e3a1;">🎙️ Farm Panel</strong>
-            <span id="farm-status" style="font-size:12px; color:#cdd6f4;">Status: Desativado</span>
+            <strong style="color:#f9e2af;">🎭 Fake Mute</strong>
+            <span id="fake-mute-status" style="font-size:12px; color:#cdd6f4;">🔊 Desativado</span>
         </div>
-        <button id="farm-toggle" style="
+        <button id="fake-mute-toggle" style="
             width:100%;
             padding:8px;
             background: #585b70;
@@ -87,50 +74,42 @@ function createPanel() {
             font-weight:bold;
             cursor:pointer;
             transition:0.2s;
-        ">Ligar</button>
+        ">Ativar Fake Mute</button>
         <div style="margin-top:10px; font-size:11px; color:#a6adc8; text-align:center;">
-            <span id="farm-detail">Clique para ativar</span>
+            <span>Você parece mutado, mas não está</span>
         </div>
     `;
 
     document.body.appendChild(panel);
 
-    const toggleBtn = document.getElementById("farm-toggle");
+    const toggleBtn = document.getElementById("fake-mute-toggle");
     toggleBtn.addEventListener("click", () => {
-        isFarming = !isFarming;
-        if (isFarming) {
-            toggleBtn.innerText = "Desligar";
-            toggleBtn.style.background = "#f38ba8";
-            document.getElementById("farm-detail").innerText = "Farm ativo (conectando...)";
-            joinVoice();
-        } else {
-            toggleBtn.innerText = "Ligar";
-            toggleBtn.style.background = "#585b70";
-            document.getElementById("farm-detail").innerText = "Farm desativado";
-            leaveVoice();
-        }
+        toggleFakeMute();
+        toggleBtn.innerText = isFakeMute ? "Desativar Fake Mute" : "Ativar Fake Mute";
+        toggleBtn.style.background = isFakeMute ? "#f38ba8" : "#585b70";
     });
-
-    updateStatus("Desativado");
 }
 
-// 🔥 Ciclo de vida usando API Revenge (igual ao Better Calls)
+// 🔥 Ciclo de vida
 export default {
     start: () => {
         createPanel();
-        console.log("[Farm] Plugin iniciado.");
+        console.log("[FakeMute] Plugin iniciado.");
     },
     stop: () => {
-        // Remove o painel
-        const panel = document.getElementById("farm-panel");
-        if (panel) panel.remove();
-        
-        // Remove todos os patches (se houver)
-        for (const unpatch of unpatches) {
-            if (typeof unpatch === 'function') unpatch();
+        // Restaura o mute real ao desativar
+        if (isFakeMute) {
+            try {
+                const modules = Object.values(webpackChunkdiscord_app?.push?.([[], {}, e => e])?.c || {});
+                const voiceMod = modules.find(m => m?.exports?.setSelfMute);
+                if (voiceMod) {
+                    voiceMod.exports.setSelfMute(originalMuteState);
+                }
+            } catch (e) {}
+            isFakeMute = false;
         }
-        unpatches = [];
-        
-        console.log("[Farm] Plugin parado.");
+        const panel = document.getElementById("fake-mute-panel");
+        if (panel) panel.remove();
+        console.log("[FakeMute] Plugin parado.");
     }
 };
