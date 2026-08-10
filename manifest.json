@@ -1,14 +1,10 @@
 {
-    "name": "VoiceFarmPanel",
-    "description": "Painel flutuante para farm de horas em call, sem reconexão automática.",
+    "name": "FakeMute",
+    "description": "Ativa o mute falso (mostra mutado mas não está).",
     "authors": [
         {
-            "name": "batzzk",
-            "id": "392942417801904129"
+            "name": "batzzk"
         }
     ],
-    "main": "index.js",
-    "vendetta": {
-        "icon": "icon-phone"
-    }
+    "main": "index.js"
 }
