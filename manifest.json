@@ -1,8 +1,14 @@
 {
-  "name": "VoiceFarmPanel",
-  "description": "Painel para entrar/sair de canais de voz no Discord Web (Voice Farm)",
-  "version": "1.0.1",
-  "author": "batzzk",
-  "id": "batzzk.voicefarmpanel",
-  "main": "index.js"
+    "name": "VoiceFarmPanel",
+    "description": "Painel flutuante para farm de horas em call, sem reconexão automática.",
+    "authors": [
+        {
+            "name": "batzzk",
+            "id": "392942417801904129"
+        }
+    ],
+    "main": "index.js",
+    "vendetta": {
+        "icon": "icon-phone"
+    }
 }
