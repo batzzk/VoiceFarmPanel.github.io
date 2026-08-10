@@ -1,0 +1,6 @@
+{
+    "name": "VoiceFarmPanel",
+    "version": "1.0.0",
+    "description": "Painel para farm de horas em call, sem reconexão automática.",
+    "authors": ["batzzk"]
+}
