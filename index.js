@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceFarmPanel - Plugin para Revenge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #a6e3a1;
+        }
+        .plugin {
+            background: #313244;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .plugin h2 {
+            margin: 0;
+            color: #f9e2af;
+        }
+        .plugin p {
+            margin: 8px 0;
+        }
+        .link {
+            background: #45475a;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            color: #89b4fa;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        .btn-copy {
+            background: #585b70;
+            border: none;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .btn-copy:hover {
+            background: #6c7086;
+        }
+        .badge {
+            background: #f38ba8;
+            color: #1e1e2e;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .howto {
+            background: #313244;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        .howto code {
+            background: #45475a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #a6e3a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ VoiceFarmPanel</h1>
+        <p>Plugin para farm de horas em call no Revenge.</p>
+
+        <div class="plugin">
+            <h2>VoiceFarmPanel</h2>
+            <p>Painel flutuante com botão Ligar/Desligar. Entra na call uma única vez. Se for desconectado, não reconecta. Se for movido, fica no novo canal.</p>
+            <span class="badge">✅ Funcional</span>
+            <div style="margin-top: 8px;">
+                <span class="link" id="link-plugin">https://VoiceFarmPanel.github.io/</span>
+                <button class="btn-copy" onclick="copyLink()">Copiar</button>
+            </div>
+            <p style="font-size: 13px; color: #a6adc8;">Instale no Revenge em: Plugins > Instalar > cole o link</p>
+        </div>
+
+        <div class="howto">
+            <h3>📥 Como instalar</h3>
+            <ol>
+                <li>Abra o Revenge (Discord modificado).</li>
+                <li>Vá em <strong>Plugins</strong>.</li>
+                <li>Toque no ícone de <strong>"+"</strong> ou <strong>"Install"</strong>.</li>
+                <li>Cole o link: <code>https://VoiceFarmPanel.github.io/</code></li>
+                <li>Clique em <strong>"Install"</strong>.</li>
+                <li>Ative o plugin na lista.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function copyLink() {
+            const text = "https://VoiceFarmPanel.github.io/";
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Link copiado!');
+            }).catch(() => {
+                // Fallback para celular
+                const el = document.getElementById("link-plugin");
+                const range = document.createRange();
+                range.selectNode(el);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                alert('✅ Link copiado!');
+            });
+        }
+    </script>
+</body>
+</html>
